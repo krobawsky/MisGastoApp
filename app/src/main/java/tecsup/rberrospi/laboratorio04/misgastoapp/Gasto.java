@@ -31,10 +31,8 @@ public class Gasto {
 
     @Override
     public String toString() {
-        return "Gasto{" +
-                "detalle='" + detalle + '\'' +
-                ", monto=" + monto +
-                '}';
+        return "Detalle : " + detalle + "\n" +
+                "Monto : " + monto;
     }
 
 }

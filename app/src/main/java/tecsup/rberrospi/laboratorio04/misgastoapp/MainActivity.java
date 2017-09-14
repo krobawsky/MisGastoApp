@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REGISTER_FORM_REQUEST = 100;
 
     private ListView list;
+    private TextView total;
 
     private AlertDialog alertDialog;
 
@@ -26,31 +29,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         list = (ListView) findViewById(R.id.list);
+        total = (TextView) findViewById(R.id.total);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
-
         list.setAdapter(adapter);
-
-        alertDialog = new AlertDialog.Builder(this).create();
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View v, int posicion, long id) {
-
-                alertDialog.setTitle("Detalle del gasto");
-                alertDialog.setMessage("El gasto en "+ list.getItemAtPosition(posicion) + " es ");
-                // Alert dialog button
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Alert dialog action goes here
-                                dialog.dismiss();// use dismiss to cancel alert dialog
-                            }
-                        });
-                alertDialog.show();
-            }
-        });
     }
 
     public void addItem(View view){
@@ -64,18 +46,38 @@ public class MainActivity extends AppCompatActivity {
 
         // refresh data
         ArrayAdapter<String> adapter = (ArrayAdapter<String>) list.getAdapter();
-
         adapter.clear();
 
         GastoRepository gastoRepository = GastoRepository.getInstance();
-
-        List<Gasto> gastos = gastoRepository.getGastos();
+        final List<Gasto> gastos = gastoRepository.getGastos();
+        double suma=0;
 
         for (Gasto gasto : gastos) {
-            adapter.add(gasto.getDetalle());
-        }
 
-        adapter.notifyDataSetChanged();
+            suma = suma+gasto.getMonto();
+            total.setText("S./ " + suma);
+
+            adapter.add(gasto.getDetalle());
+            alertDialog = new AlertDialog.Builder(this).create();
+
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View v, int posicion, long id) {
+
+                    alertDialog.setTitle("Detalle del gasto");
+                    alertDialog.setMessage(""+gastos.get(posicion));
+                    // Alert dialog button
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
+        }
     }
 
 }
